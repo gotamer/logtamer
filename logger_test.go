@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-var file = "test.log"
+var logfile = "test.log"
 var appname = "LogTest"
 
 // Switch between log levels
@@ -31,7 +31,7 @@ func TestDefault(t *testing.T) {
 func TestLevel0(t *testing.T) {
 	var lev uint8 = 0
 	fmt.Println("FMT changing Default Level ", lev)
-	Default(appname, file)
+	Default(appname, logfile)
 	Level(lev)
 	fmt.Println("FMT Testing ", lev)
 	Debug.Println("Level ", lev)
@@ -44,7 +44,7 @@ func TestLevel0(t *testing.T) {
 func TestLevel2(t *testing.T) {
 	var lev uint8 = 2
 	fmt.Println("FMT changing Default Level ", lev)
-	Default(appname, file)
+	Default(appname, logfile)
 	Level(lev)
 	fmt.Println("FMT Testing ", lev)
 	Debug.Println("Level ", lev)
@@ -57,7 +57,7 @@ func TestLevel2(t *testing.T) {
 func TestLevel3(t *testing.T) {
 	var lev uint8 = 3
 	fmt.Println("FMT changing Default Level ", lev)
-	Default(appname, file)
+	Default(appname, logfile)
 	Level(lev)
 	fmt.Println("FMT Testing ", lev)
 	Debug.Println("Level ", lev)
@@ -69,7 +69,7 @@ func TestLevel3(t *testing.T) {
 func TestLevel4(t *testing.T) {
 	var lev uint8 = 4
 	fmt.Println("FMT changing Default Level ", lev)
-	Default(appname, file)
+	Default(appname, logfile)
 	Level(lev)
 	fmt.Println("FMT Testing ", lev)
 	Debug.Println("Level ", lev)
@@ -81,7 +81,7 @@ func TestLevel4(t *testing.T) {
 func TestLevel5(t *testing.T) {
 	var lev uint8 = 5
 	fmt.Println("FMT changing Default Level ", lev)
-	Default(appname, file)
+	Default(appname, logfile)
 	Level(lev)
 	fmt.Println("FMT Testing ", lev)
 	Debug.Println("Level ", lev)
@@ -89,4 +89,5 @@ func TestLevel5(t *testing.T) {
 	Warn.Println("Level ", lev)
 	Error.Println("Level ", lev)
 	fmt.Println("FMT end Testing ", lev)
+	Close()
 }

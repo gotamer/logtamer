@@ -27,9 +27,11 @@ const (
 )
 
 var (
-	o     = new(LogCfg)
-	mail  *send.SmtpTamer
-	file  *os.File
+	o = new(LogCfg)
+
+	mail *send.SmtpTamer
+	file *os.File
+
 	Debug = *log.Default()
 	Info  = *log.Default()
 	Warn  = *log.Default()
@@ -56,8 +58,14 @@ func init() {
 }
 
 func Close() {
-	err := file.Close()
-	log.Fatal("Close Log File err: ", err)
+	Info.Println("Closing log file")
+	if err := file.Close(); err != nil {
+		log.Fatal("Close Log File err: ", err)
+	}
+}
+
+func (LogCfg) Config() *LogCfg {
+	return o
 }
 
 // filepath.Join(appPath, appName+".log")
