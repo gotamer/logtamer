@@ -10,7 +10,7 @@ import (
 
 // Configuration
 type LogCfg struct {
-	AppName    string
+	appName    string
 	File       string
 	SendMailTo string // Application Admin Email
 	Smtp       struct {
@@ -21,11 +21,15 @@ type LogCfg struct {
 	}
 }
 
-const FAKEHOSTNAME = "example.com"
+const (
+	FAKEHOSTNAME = "example.com"
+	APPNAME      = "LogTamer"
+)
 
 var (
 	o     = new(LogCfg)
 	mail  *send.SmtpTamer
+	file  *os.File
 	Debug = *log.Default()
 	Info  = *log.Default()
 	Warn  = *log.Default()
@@ -34,7 +38,8 @@ var (
 
 func init() {
 	// Config file defaults
-	o.File = "GoTamerLogger.log"
+	o.File = "LogTamer.log"
+	o.appName = APPNAME
 	o.SendMailTo = "admin@example.com"
 	o.Smtp.Hostname = FAKEHOSTNAME
 	o.Smtp.Hostport = 587
@@ -50,10 +55,19 @@ func init() {
 	Error.SetFlags(log.Ltime | log.Lshortfile)
 }
 
+func Close() {
+	err := file.Close()
+	log.Fatal("Close Log File err: ", err)
+}
+
 // filepath.Join(appPath, appName+".log")
-func Default(appName, file string) {
-	o.AppName = appName
-	o.File = file
+func Default(appName, fileName string) {
+	if appName != "" {
+		o.appName = appName
+	}
+	if fileName != "" {
+		o.File = fileName
+	}
 }
 
 // Switch between log levels
@@ -71,16 +85,19 @@ func Level(level uint8) {
 	Info = *log.Default()
 	Warn = *log.Default()
 	Error = *log.Default()
+
 	Debug.SetPrefix("DBG ")
 	Info.SetPrefix("INF ")
 	Warn.SetPrefix("WRN ")
 	Error.SetPrefix("ERR ")
+
 	Info.SetFlags(log.Ltime | log.Lshortfile)
 	Debug.SetFlags(log.Ltime | log.Lshortfile)
 	Warn.SetFlags(log.Ltime | log.Lshortfile)
 	Error.SetFlags(log.Ltime | log.Lshortfile)
 
-	file, err := os.OpenFile(o.File, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
+	var err error
+	file, err = os.OpenFile(o.File, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -116,9 +133,9 @@ func Level(level uint8) {
 		}
 		// email errors to admin
 		mail = send.NewSMTP(o.Smtp.Hostname, o.Smtp.Username, o.Smtp.Password)
-		mail.Envelop.SetFrom(o.AppName, o.Smtp.Username)
+		mail.Envelop.SetFrom(o.appName, o.Smtp.Username)
 		mail.Envelop.SetTo("", o.SendMailTo)
-		mail.Envelop.Subject = "ERROR " + o.AppName
+		mail.Envelop.Subject = "ERROR " + o.appName
 
 		Debug.SetOutput(ioutil.Discard)
 		Info.SetOutput(ioutil.Discard)
@@ -131,9 +148,9 @@ func Level(level uint8) {
 		}
 		// email errors to admin
 		mail = send.NewSMTP(o.Smtp.Hostname, o.Smtp.Username, o.Smtp.Password)
-		mail.Envelop.SetFrom(o.AppName, o.Smtp.Username)
+		mail.Envelop.SetFrom(o.appName, o.Smtp.Username)
 		mail.Envelop.SetTo("", o.SendMailTo)
-		mail.Envelop.Subject = "ERROR " + o.AppName
+		mail.Envelop.Subject = "ERROR " + o.appName
 
 		Debug.SetOutput(ioutil.Discard)
 		Info.SetOutput(ioutil.Discard)
