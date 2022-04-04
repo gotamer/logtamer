@@ -64,7 +64,7 @@ func Close() {
 	}
 }
 
-func (LogCfg) Config() *LogCfg {
+func Config() *LogCfg {
 	return o
 }
 
