@@ -1,4 +1,4 @@
-module logtamer
+module  github.com/gotamer/logtamer
 
 go 1.17
 
