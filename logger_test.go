@@ -89,5 +89,5 @@ func TestLevel5(t *testing.T) {
 	Warn.Println("Level ", lev)
 	Error.Println("Level ", lev)
 	fmt.Println("FMT end Testing ", lev)
-	Close()
+	FileClose()
 }

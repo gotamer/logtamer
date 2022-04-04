@@ -47,17 +47,13 @@ func init() {
 	o.Smtp.Hostport = 587
 	o.Smtp.Username = "user@example.com"
 	o.Smtp.Password = "Long-Complicated-Secret-Pass-Word"
-	Debug.SetPrefix("DBG ")
-	Info.SetPrefix("INF ")
-	Warn.SetPrefix("WRN ")
-	Error.SetPrefix("ERR ")
-	Info.SetFlags(log.Ltime | log.Lshortfile)
-	Debug.SetFlags(log.Ltime | log.Lshortfile)
-	Warn.SetFlags(log.Ltime | log.Lshortfile)
-	Error.SetFlags(log.Ltime | log.Lshortfile)
+	Level(1)
 }
 
-func Close() {
+func FileClose() {
+	if file == nil {
+		return
+	}
 	Info.Println("Closing log file")
 	if err := file.Close(); err != nil {
 		log.Fatal("Close Log File err: ", err)
@@ -68,13 +64,14 @@ func Config() *LogCfg {
 	return o
 }
 
+// Set defaults
 // filepath.Join(appPath, appName+".log")
-func Default(appName, fileName string) {
-	if appName != "" {
-		o.appName = appName
+func Default(appname, filename string) {
+	if appname != "" {
+		o.appName = appname
 	}
-	if fileName != "" {
-		o.File = fileName
+	if filename != "" {
+		o.File = filename
 	}
 }
 
@@ -104,12 +101,6 @@ func Level(level uint8) {
 	Warn.SetFlags(log.Ltime | log.Lshortfile)
 	Error.SetFlags(log.Ltime | log.Lshortfile)
 
-	var err error
-	file, err = os.OpenFile(o.File, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	switch level {
 	case 0:
 		// Level 0 No Logging at all
@@ -122,17 +113,21 @@ func Level(level uint8) {
 	case 2:
 		// Level 2 info, warn & error to screen, debug to file
 		// Log all but debug to screen aka debug mode. Debug goes to file
+		openFile()
 		Debug.SetOutput(file)
 	case 3:
 		// Level 3 warn & error to screen, debug and info to file
+		openFile()
 		Info.SetOutput(file)
 		Debug.SetOutput(file)
 	case 4:
 		// Level 4 warn & error to file
+		openFile()
 		Warn.SetOutput(file)
 		Error.SetOutput(file)
 	case 5:
 		// Level 5 error to file
+		openFile()
 		Error.SetOutput(file)
 	case 6:
 		// Level 6 warn & error to mail
@@ -167,5 +162,13 @@ func Level(level uint8) {
 
 	default:
 		// Same as Level 1, output all to screen
+	}
+}
+
+func openFile() {
+	var err error
+	file, err = os.OpenFile(o.File, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
+	if err != nil {
+		log.Fatal(err)
 	}
 }
