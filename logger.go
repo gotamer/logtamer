@@ -21,9 +21,14 @@ type LogCfg struct {
 	}
 }
 
+type bool_type bool
+
 const (
 	FAKEHOSTNAME = "example.com"
 	APPNAME      = "LogTamer"
+
+	EXIT_YES bool_type = true
+	EXIT_NO  bool_type = false
 )
 
 var (
@@ -65,13 +70,26 @@ func Config() *LogCfg {
 }
 
 // Set defaults
-// filepath.Join(appPath, appName+".log")
+// filename is filename including path
 func Default(appname, filename string) {
 	if appname != "" {
 		o.appName = appname
 	}
 	if filename != "" {
 		o.File = filename
+	}
+}
+
+func Err(err error, exit bool_type, msg string) {
+	if err != nil {
+		if msg != "" {
+			Error.Printf("%s: %w", msg, err)
+		} else {
+			Error.Println(err)
+		}
+		if exit {
+			os.Exit(1)
+		}
 	}
 }
 
